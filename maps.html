@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>360 Sphere</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <style>
+      /* Style for the sidebar container */
+      #sidebar {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        bottom: 10px;
+        width: 200px;
+        background-color: rgba(255, 255, 255, 0.7);
+        overflow-y: auto;
+        padding: 10px;
+        border-radius: 5px;
+        z-index: 9999;
+      }
+
+      /* Style for each thumbnail */
+      .thumbnail {
+        width: 100%;
+        margin-bottom: 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar container -->
+    <div id="sidebar">
+      <!-- Thumbnails of 360-degree images -->
+      <h1>Select a image</h1>
+      <img class="thumbnail" src="images/12.jpg" data-image="images/12.jpg" data-altitude="10">
+      <img class="thumbnail" src="images/13.jpg" data-image="images/13.jpg" data-altitude="10">
+      <img class="thumbnail" src="images/15.jpg" data-image="images/15.jpg" data-altitude="10">
+      <!-- Add more thumbnails as needed -->
+    </div>
+
+    <!-- A-Frame scene -->
+    <a-scene>
+      <!--<a-sky id="sky" rotation="0 -90 0" radius="10"></a-sky>-->
+      <a-sky id="sky" rotation="0 -90 0" radius="10" src="12.jpg"></a-sky>
+    </a-scene>
+
+    <!-- Script to handle clicking on thumbnails -->
+    <script>
+      // Function to change the sky image
+      function changeImage(imageSrc, altitude) {
+        var sky = document.getElementById('sky');
+        sky.setAttribute('src', imageSrc);
+        sky.setAttribute('radius', altitude);
+      }
+
+      // Get all thumbnails
+      var thumbnails = document.querySelectorAll('.thumbnail');
+
+      // Add click event listener to each thumbnail
+      thumbnails.forEach(function(thumbnail) {
+        thumbnail.addEventListener('click', function() {
+          // Get the image source and altitude from the data attributes
+          var imageSrc = this.getAttribute('data-image');
+          var altitude = this.getAttribute('data-altitude');
+          
+          // Change the image
+          changeImage(imageSrc, altitude);
+        });
+      });
+    </script>
+  </body>
+</html>
