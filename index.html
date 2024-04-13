@@ -5,79 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>360 Sphere</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
-      /* Style for the sidebar container */
-      #sidebar {
+      /* Style for the map container */
+      #map {
         position: absolute;
-        top: 10px;
-        left: 10px;
-        bottom: 10px;
-        width: 200px;
-        background-color: rgba(255, 255, 255, 0.7);
-        overflow-y: auto;
-        padding: 10px;
-        border-radius: 5px;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      /* Style for the full window view */
+      #full-window-view {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: none;
         z-index: 9999;
       }
 
-      /* Style for each thumbnail */
-      .thumbnail {
-        width: 100%;
-        margin-bottom: 10px;
+      /* Style for the close button */
+      #close-button {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: #fff;
+        font-size: 24px;
         cursor: pointer;
+        z-index: 10000;
       }
     </style>
   </head>
   <body>
-    <!-- Sidebar container -->
-    <div id="sidebar">
-      <!-- Thumbnails of 360-degree images -->
-      <h1>Select an image</h1>
-      <img class="thumbnail" src="images/12.jpg" data-image="images/12.jpg" data-altitude="10">
-      <img class="thumbnail" src="images/13.jpg" data-image="images/13.jpg" data-altitude="10">
-      <img class="thumbnail" src="images/15.jpg" data-image="images/15.jpg" data-altitude="10">
-      <img class="thumbnail" src="images/360-1.jpg" data-image="images/360-1.jpg" data-altitude="10">
+    <!-- Map container -->
+    <div id="map"></div>
 
-      <!-- Add more thumbnails as needed -->
+    <!-- Full window view -->
+    <div id="full-window-view">
+      <!-- Close button -->
+      <div id="close-button">×</div>
+
+      <!-- A-Frame scene -->
+      <a-scene>
+        <a-sky id="full-window-sky" rotation="0 -90 0" radius="10"></a-sky>
+      </a-scene>
     </div>
 
-    <!-- A-Frame scene -->
-    <a-scene>
-      <!--<a-sky id="sky" rotation="0 -90 0" radius="10"></a-sky>-->
-      <a-sky id="sky" rotation="0 -90 0" radius="10" src="images/12.jpg"></a-sky>
-    </a-scene>
-
-    <!-- Script to handle clicking on thumbnails -->
+    <!-- Script to handle map and full window view -->
     <script>
-      // Function to change the sky image
-      function changeImage(imageSrc, altitude) {
-        var sky = document.getElementById('sky');
-        sky.setAttribute('src', imageSrc);
-        sky.setAttribute('radius', altitude);
+      // Function to update the full window view with the selected image
+      function updateFullWindowView(imageSrc, altitude) {
+        var fullWindowSky = document.getElementById('full-window-sky');
+        fullWindowSky.setAttribute('src', imageSrc);
+        fullWindowSky.setAttribute('radius', altitude);
+
+        // Show the full window view
+        document.getElementById('full-window-view').style.display = 'block';
       }
 
-      // Get all thumbnails
-      var thumbnails = document.querySelectorAll('.thumbnail');
+      // Function to close the full window view
+      document.getElementById('close-button').addEventListener('click', function() {
+        document.getElementById('full-window-view').style.display = 'none';
+      });
 
-      // Add click and touch event listeners to each thumbnail
-      thumbnails.forEach(function(thumbnail) {
-        thumbnail.addEventListener('click', function() {
-          handleImageChange(this);
-        });
-        thumbnail.addEventListener('touchstart', function() {
-          handleImageChange(this);
+      // Initialize the Leaflet map
+      var map = L.map('map').setView([55.61893346692764, 12.460899353027346], 12); // Default to New York
+
+      // Add a tile layer to the map
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '&copy; <a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">Esri</a> contributors'
+      }).addTo(map);
+
+      // Define waypoints with their corresponding image sources and altitudes
+      var waypoints = [
+        { coordinates: [55.62775064045902, 12.026671171188356], imageSrc: 'images/12.jpg', altitude: 10 }, // New York
+        { coordinates: [55.5472958725909, 12.207881212234497], imageSrc: 'images/13.jpg', altitude: 10 }, // Los Angeles
+        { coordinates: [55.54755686361569, 12.207419872283937], imageSrc: 'images/15.jpg', altitude: 10 }, // London
+        { coordinates: [55.62023905467506, 12.453823685646057], imageSrc: 'images/360-1.jpg', altitude: 10 } // Paris
+      ];
+
+      // Add markers for each waypoint
+      waypoints.forEach(function(waypoint) {
+        var marker = L.marker(waypoint.coordinates).addTo(map);
+        marker.on('click', function() {
+          updateFullWindowView(waypoint.imageSrc, waypoint.altitude);
         });
       });
 
-      // Function to handle image change
-      function handleImageChange(element) {
-        // Get the image source and altitude from the data attributes
-        var imageSrc = element.getAttribute('data-image');
-        var altitude = element.getAttribute('data-altitude');
-        
-        // Change the image
-        changeImage(imageSrc, altitude);
-      }
+      // Add event listener for middle click on the map
+      map.on('mousedown', function(event) {
+        if (event.originalEvent.button === 1) { // Check for middle click
+          var latlng = map.mouseEventToLatLng(event.originalEvent);
+          console.log("Coordinates:", [latlng.lat, latlng.lng]);
+        }
+      });
     </script>
   </body>
 </html>
