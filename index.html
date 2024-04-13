@@ -10,14 +10,12 @@
         position: absolute;
         top: 10px;
         left: 10px;
-        bottom: 10px;
         width: 200px;
         background-color: rgba(255, 255, 255, 0.7);
         overflow-y: auto;
         padding: 10px;
         border-radius: 5px;
         z-index: 9999;
-        transition: height 0.5s ease; /* Add transition effect */
       }
 
       /* Style for each thumbnail */
@@ -30,22 +28,31 @@
       /* Style for the toggle button */
       #toggle-button {
         position: absolute;
-        top: 10px;
-        left: 10px;
-        padding: 5px;
+        padding: 10px;
+        width: inherit;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
         cursor: pointer;
         z-index: 10000;
+        font-size: medium;
+        top: 0px;
       }
     </style>
   </head>
   <body>
-    <!-- Toggle button -->
-    <div id="toggle-button" onclick="toggleSidebar()">Toggle Sidebar</div>
-
+    
+    
     <!-- Sidebar container -->
     <div id="sidebar">
+      <!-- Toggle button -->
+      <button id="toggle-button" onclick="toggleSidebar()">Toggle Sidebar</button>
       <!-- Thumbnails of 360-degree images -->
-      <h1>Select a image</h1>
+      <br>
+      <center>
+        <h2>Select an image</h2>
+      </center>
       <img class="thumbnail" src="images/12.jpg" data-image="images/12.jpg" data-altitude="10">
       <img class="thumbnail" src="images/13.jpg" data-image="images/13.jpg" data-altitude="10">
       <img class="thumbnail" src="images/15.jpg" data-image="images/15.jpg" data-altitude="10">
@@ -86,10 +93,10 @@
       // Function to toggle the sidebar visibility
       function toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
-        if (sidebar.style.height === 'auto' || sidebar.style.height === '') {
-          sidebar.style.height = '0';
+        if (sidebar.style.display === 'block' || sidebar.style.display === '') {
+          sidebar.style.display = 'none';
         } else {
-          sidebar.style.height = 'auto';
+          sidebar.style.display = 'block';
         }
       }
     </script>
