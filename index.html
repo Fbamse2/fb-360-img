@@ -17,7 +17,7 @@
         padding: 10px;
         border-radius: 5px;
         z-index: 9999;
-        transition: width 0.5s ease; /* Add transition effect */
+        transition: height 0.5s ease; /* Add transition effect */
       }
 
       /* Style for each thumbnail */
@@ -86,10 +86,10 @@
       // Function to toggle the sidebar visibility
       function toggleSidebar() {
         var sidebar = document.getElementById('sidebar');
-        if (sidebar.style.width === '200px') {
-          sidebar.style.width = '0';
+        if (sidebar.style.height === 'auto' || sidebar.style.height === '') {
+          sidebar.style.height = '0';
         } else {
-          sidebar.style.width = '200px';
+          sidebar.style.height = 'auto';
         }
       }
     </script>
