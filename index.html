@@ -2,6 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>360 Sphere</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <style>
@@ -10,6 +11,7 @@
         position: absolute;
         top: 10px;
         left: 10px;
+        bottom: 10px;
         width: 200px;
         background-color: rgba(255, 255, 255, 0.7);
         overflow-y: auto;
@@ -24,40 +26,16 @@
         margin-bottom: 10px;
         cursor: pointer;
       }
-
-      /* Style for the toggle button */
-      #toggle-button {
-        position: absolute;
-        padding: 10px;
-        width: inherit;
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        z-index: 10000;
-        font-size: medium;
-        top: 0px;
-      }
     </style>
   </head>
   <body>
-
-    <!-- Toggle button -->
-    <br>
-    <button id="toggle-button" onclick="toggleSidebar()">Toggle Sidebar</button>
-    <br>
-    
     <!-- Sidebar container -->
     <div id="sidebar">
       <!-- Thumbnails of 360-degree images -->
-      <center>
-        <h2>Select an image</h2>
-      </center>
+      <h1>Select an image</h1>
       <img class="thumbnail" src="images/12.jpg" data-image="images/12.jpg" data-altitude="10">
       <img class="thumbnail" src="images/13.jpg" data-image="images/13.jpg" data-altitude="10">
       <img class="thumbnail" src="images/15.jpg" data-image="images/15.jpg" data-altitude="10">
-      <img class="thumbnail" src="images/360-1.jpg" data-image="images/360-1.jpg" data-altitude="10">
       <!-- Add more thumbnails as needed -->
     </div>
 
@@ -79,26 +57,24 @@
       // Get all thumbnails
       var thumbnails = document.querySelectorAll('.thumbnail');
 
-      // Add click event listener to each thumbnail
+      // Add click and touch event listeners to each thumbnail
       thumbnails.forEach(function(thumbnail) {
         thumbnail.addEventListener('click', function() {
-          // Get the image source and altitude from the data attributes
-          var imageSrc = this.getAttribute('data-image');
-          var altitude = this.getAttribute('data-altitude');
-          
-          // Change the image
-          changeImage(imageSrc, altitude);
+          handleImageChange(this);
+        });
+        thumbnail.addEventListener('touchstart', function() {
+          handleImageChange(this);
         });
       });
 
-      // Function to toggle the sidebar visibility
-      function toggleSidebar() {
-        var sidebar = document.getElementById('sidebar');
-        if (sidebar.style.display === 'block' || sidebar.style.display === '') {
-          sidebar.style.display = 'none';
-        } else {
-          sidebar.style.display = 'block';
-        }
+      // Function to handle image change
+      function handleImageChange(element) {
+        // Get the image source and altitude from the data attributes
+        var imageSrc = element.getAttribute('data-image');
+        var altitude = element.getAttribute('data-altitude');
+        
+        // Change the image
+        changeImage(imageSrc, altitude);
       }
     </script>
   </body>
