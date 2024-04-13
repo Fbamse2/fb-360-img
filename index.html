@@ -17,6 +17,7 @@
         padding: 10px;
         border-radius: 5px;
         z-index: 9999;
+        transition: width 0.5s ease; /* Add transition effect */
       }
 
       /* Style for each thumbnail */
@@ -25,9 +26,22 @@
         margin-bottom: 10px;
         cursor: pointer;
       }
+
+      /* Style for the toggle button */
+      #toggle-button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 5px;
+        cursor: pointer;
+        z-index: 10000;
+      }
     </style>
   </head>
   <body>
+    <!-- Toggle button -->
+    <div id="toggle-button" onclick="toggleSidebar()">Toggle Sidebar</div>
+
     <!-- Sidebar container -->
     <div id="sidebar">
       <!-- Thumbnails of 360-degree images -->
@@ -68,6 +82,16 @@
           changeImage(imageSrc, altitude);
         });
       });
+
+      // Function to toggle the sidebar visibility
+      function toggleSidebar() {
+        var sidebar = document.getElementById('sidebar');
+        if (sidebar.style.width === '200px') {
+          sidebar.style.width = '0';
+        } else {
+          sidebar.style.width = '200px';
+        }
+      }
     </script>
   </body>
 </html>
