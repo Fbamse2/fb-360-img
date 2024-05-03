@@ -1,110 +1,128 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>360 Sphere</title>
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <style>
-      /* Style for the map container */
-      #map {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-      }
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>360 Sphere</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    /* Style for the map container */
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
 
-      /* Style for the full window view */
-      #full-window-view {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.9);
-        display: none;
-        z-index: 9999;
-      }
+    /* Style for the full window view */
+    #full-window-view {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      display: none;
+      z-index: 9999;
+    }
 
-      /* Style for the close button */
-      #close-button {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        color: black;
-        font-size: 24px;
-        cursor: pointer;
-        z-index: 10000;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Map container -->
-    <div id="map"></div>
+    /* Style for the close button */
+    #close-button {
+      position: absolute;
+      top: 0px;
+      right: 20px;
+      color: black;
+      font-size: 48px;
+      cursor: pointer;
+      z-index: 10000;
+      user-select: none; /* Prevents the close button from being copied */
+    }
+  </style>
+</head>
+<body>
+<!-- Map container -->
+<div id="map"></div>
 
-    <!-- Full window view -->
-    <div id="full-window-view">
-      <!-- Close button -->
-      <div id="close-button">×</div>
+<!-- Full window view -->
+<div id="full-window-view">
+  <!-- Close button -->
+  <div id="close-button">×</div>
 
-      <!-- A-Frame scene -->
-      <a-scene>
-        <a-sky id="full-window-sky" rotation="0 -90 0" radius="10"></a-sky>
-      </a-scene>
-    </div>
+  <!-- A-Frame scene -->
+  <a-scene vr="false" vr-mode-ui="enabled: false">
+    <a-sky id="full-window-sky" rotation="0 -90 0" radius="10"></a-sky>
+  </a-scene>
+</div>
 
-    <!-- Script to handle map and full window view -->
-    <script>
-      // Function to update the full window view with the selected image
-      function updateFullWindowView(imageSrc, altitude) {
-        var fullWindowSky = document.getElementById('full-window-sky');
-        fullWindowSky.setAttribute('src', imageSrc);
-        fullWindowSky.setAttribute('radius', altitude);
+<!-- Script to handle map and full window view -->
+<script>
+  // Initialize the Leaflet map
+  var map;
+  var mapPosition = JSON.parse(localStorage.getItem('mapPosition'));
 
-        // Show the full window view
-        document.getElementById('full-window-view').style.display = 'block';
-      }
+  if (mapPosition) {
+    map = L.map('map').setView(mapPosition.center, mapPosition.zoom);
+  } else {
+    map = L.map('map').setView([55.61893346692764, 12.460899353027346], 12); // Default to New York
+  }
 
-      // Function to close the full window view
-      document.getElementById('close-button').addEventListener('click', function() {
-        document.getElementById('full-window-view').style.display = 'none';
-      });
+  // Add a tile layer to the map
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '&copy; <a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">Esri</a> contributors'
+  }).addTo(map);
 
-      // Initialize the Leaflet map
-      var map = L.map('map').setView([55.61893346692764, 12.460899353027346], 12); // Default to New York
+  // Define waypoints with their corresponding image sources and altitudes
+  var waypoints = [
+    { coordinates: [55.62775064045902, 12.026671171188356], imageSrc: 'images/12.jpg', altitude: 10 },
+    { coordinates: [55.5472958725909, 12.207881212234497], imageSrc: 'images/13.jpg', altitude: 10 },
+    { coordinates: [55.54755686361569, 12.207419872283937], imageSrc: 'images/15.jpg', altitude: 10 },
+    { coordinates: [55.62023905467506, 12.453823685646057], imageSrc: 'images/360-1.jpg', altitude: 10 },
+    { coordinates: [55.124723077923925, 14.913940429687502], imageSrc: 'images/bornholm/IMG_20230925_092253_00_225.jpg', altitude: 10 }
+  ];
 
-      // Add a tile layer to the map
-      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: '&copy; <a href="https://www.arcgis.com/home/item.html?id=10df2279f9684e4a9f6a7f08febac2a9">Esri</a> contributors'
-      }).addTo(map);
+  // Add markers for each waypoint
+  waypoints.forEach(function(waypoint) {
+    var marker = L.marker(waypoint.coordinates).addTo(map);
+    marker.on('click', function() {
+      updateFullWindowView(waypoint.imageSrc, waypoint.altitude);
+    });
+  });
 
-      // Define waypoints with their corresponding image sources and altitudes
-      var waypoints = [
-        { coordinates: [55.62775064045902, 12.026671171188356], imageSrc: 'images/12.jpg', altitude: 10 }, // New York
-        { coordinates: [55.5472958725909, 12.207881212234497], imageSrc: 'images/13.jpg', altitude: 10 }, // Los Angeles
-        { coordinates: [55.54755686361569, 12.207419872283937], imageSrc: 'images/15.jpg', altitude: 10 }, // London
-        { coordinates: [55.62023905467506, 12.453823685646057], imageSrc: 'images/360-1.jpg', altitude: 10 } // Paris
-      ];
+  // Add event listener for middle click on the map
+  map.on('mousedown', function(event) {
+    if (event.originalEvent.button === 1) { // Check for middle click
+      var latlng = map.mouseEventToLatLng(event.originalEvent);
+      console.log("Coordinates:", [latlng.lat, latlng.lng]);
+    }
+  });
 
-      // Add markers for each waypoint
-      waypoints.forEach(function(waypoint) {
-        var marker = L.marker(waypoint.coordinates).addTo(map);
-        marker.on('click', function() {
-          updateFullWindowView(waypoint.imageSrc, waypoint.altitude);
-        });
-      });
+  // Function to update the full window view with the selected image
+  function updateFullWindowView(imageSrc, altitude) {
+    var fullWindowSky = document.getElementById('full-window-sky');
+    fullWindowSky.setAttribute('src', imageSrc);
+    fullWindowSky.setAttribute('radius', altitude);
 
-      // Add event listener for middle click on the map
-      map.on('mousedown', function(event) {
-        if (event.originalEvent.button === 1) { // Check for middle click
-          var latlng = map.mouseEventToLatLng(event.originalEvent);
-          console.log("Coordinates:", [latlng.lat, latlng.lng]);
-        }
-      });
-    </script>
-  </body>
+    // Show the full window view
+    document.getElementById('full-window-view').style.display = 'block';
+  }
+
+  // Function to close the full window view
+  document.getElementById('close-button').addEventListener('click', function() {
+    document.getElementById('full-window-view').style.display = 'none';
+  });
+
+  // Save map position to local storage when the map is moved
+  map.on('moveend', function() {
+    var mapPosition = {
+      center: map.getCenter(),
+      zoom: map.getZoom()
+    };
+    localStorage.setItem('mapPosition', JSON.stringify(mapPosition));
+  });
+</script>
+</body>
 </html>
